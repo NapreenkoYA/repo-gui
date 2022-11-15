@@ -1,5 +1,9 @@
 package lesson2;
+<<<<<<< Updated upstream
 
+=======
+// hw2
+>>>>>>> Stashed changes
 public class HomeWork2 {
     public static void main(String[] args) {
 
