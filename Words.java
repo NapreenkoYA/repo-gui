@@ -2,7 +2,7 @@ package lesson4;
 
 import java.util.*;
 
-public class Task3 {
+public class Words {
     public static void main(String[] args) {
         String[] words = {"dog", "cat", "pet", "lock", "mock", "lock", "fork", "mock", "golf", "lock"};
 
