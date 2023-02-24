@@ -1,4 +1,3 @@
-package lesson3;
 
 import io.restassured.http.ContentType;
 import io.restassured.http.Cookie;
