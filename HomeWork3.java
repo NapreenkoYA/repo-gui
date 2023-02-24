@@ -1,87 +1,251 @@
 package lesson3;
 
-public class HomeWork3 {
+import io.restassured.http.ContentType;
+import io.restassured.http.Cookie;
+import io.restassured.http.Headers;
+import io.restassured.http.Method;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.Test;
+
+import java.util.Map;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.lessThan;
 
 
-    public static void main(String[] args) {
-        task1();
-        task2();
-        task3();
-        task4();
-        task5();
+public class ExampleTest extends AbstractTest {
 
+    @Test
+    void getExampleTest() {
+        given()
+                .when()
+                .get(getBaseUrl()+"recipes/716429/information?" +
+                        "includeNutrition=false&apiKey=" +getApiKey())
+                                .then()
+                                .statusCode(200);
 
-    }
-// Написать метод, принимающий на вход два аргумента: len и initialValue,
-// и возвращающий одномерный массив типа int длиной len, каждая ячейка которого равна initialValue
-    private static void task5(int len, int initialValue) {
-        int[] arr = new int[len];
-        for (int i = 0; i < len; i++) {
-            arr[i] = initialValue;
-            System.out.print("[" + i + "]" + arr[i] + " ");
-        }
-    }
-
-// Создать квадратный двумерный целочисленный массив (количество строк и столбцов одинаковое),
-// и с помощью цикла(-ов) заполнить его диагональные элементы единицами (можно только одну из диагоналей, если обе сложно).
-// Определить элементы одной из диагоналей можно по следующему принципу:
-// индексы таких элементов равны, то есть [0][0], [1][1], [2][2], …, [n][n];
-    private static void task4() {
-        int[][] arr = new int[3][3];
-        for (int i = 0; i < arr.length; i++) {
-            for (int j = 0, x = arr[i].length - 1; j < arr[i].length; j++, x--) {
-                if (i == j || i == x) arr[i][j] = 1;
-                else arr[i][j] = 0;
-                System.out.print(arr[i][j] + " ");
-            }
-            System.out.print("\n");
-        }
-    }
-// Задать массив [ 1, 5, 3, 2, 11, 4, 5, 2, 4, 8, 9, 1 ] пройти по нему циклом, и числа меньшие 6 умножить на 2;
-    private static void task3() {
-        int[] mult = {1, 5, 3, 2, 11, 4, 5, 2, 4, 8, 9, 1};
-        int multOn2 = mult.length;
-        for (int i = 0; i < mult.length; i++) {
-            if (mult[i] < 6) {
-                mult[i] = mult[i] * 2;
-            }
-            System.out.print(mult[i] + " ");
-        }
-
+        given()
+                .when()
+                .request(Method.GET,getBaseUrl()+"recipes/716429/information?" +
+                        "includeNutrition={Nutrition}&apiKey={apiKey}", false, getApiKey())
+                .then()
+                .statusCode(200);
     }
 
-// Задать целочисленный массив, состоящий из элементов 0 и 1. Например: [ 1, 1, 0, 0, 1, 0, 1, 1, 0, 0 ].
-// С помощью цикла и условия заменить 0 на 1, 1 на 0;
-    private static void task1() {
-        int[] arr = {1, 1, 0, 0, 1, 0, 1, 1, 0, 1};
-        int arrll = arr.length;
-        for (int i = 0; i < arr.length; i++) {
-            if (arr[i] == 0) {
-                arr[i] = 1;
-            } else {
-                arr[i] = 0;
-            }
-            System.out.print(arr[i] + " ");
-        }
-    }
-// 
-    private static void task2() {
-        int[] fillArr = new int[100];
-        for (int i = 0; i < fillArr.length; i++) {
-            fillArr[i] = i + 1;
-            System.out.println(fillArr[i] + " ");
-        }
+    @Test
+    void getSpecifyingRequestDataTest() {
+        given()
+                .queryParam("apiKey", getApiKey())
+                .queryParam("includeNutrition", "false")
+                .pathParam("id", 716429)
+                .when()
+                .get(getBaseUrl()+"recipes/{id}/information")
+                .then()
+                .statusCode(200);
+
+        given()
+                .when()
+                .get(getBaseUrl()+"recipes/{id}/information?" +
+                        "includeNutrition={Nutrition}&apiKey={apiKey}",716429, false, getApiKey())
+                .then()
+                .statusCode(200);
+
+        given()
+                .queryParam("apiKey", getApiKey())
+                .contentType("application/x-www-form-urlencoded")
+                .formParam("title","Pork roast with green beans")
+                .when()
+                .post(getBaseUrl()+"recipes/cuisine")
+                .then()
+                .statusCode(200);
+
+        Cookie someCookie = new Cookie
+                .Builder("some_cookie", "some_value")
+                .setSecured(true)
+                .setComment("some comment")
+                .build();
+
+
+        given().cookie("username","max")
+                .cookie(someCookie)
+                .when()
+                .get(getBaseUrl()+"recipes/716429/information?" +
+                        "includeNutrition=false&apiKey=" +getApiKey())
+                .then()
+                .statusCode(200);
+
+        given().headers("username","max")
+                .when()
+                .get(getBaseUrl()+"recipes/716429/information?" +
+                        "includeNutrition=false&apiKey=" +getApiKey())
+                .then()
+                .statusCode(200);
+
+        given()
+                .queryParam("hash", "a3da66460bfb7e62ea1c96cfa0b7a634a346ccbf")
+                .queryParam("apiKey", getApiKey())
+                .body("{\n"
+                        + " \"date\": 1644881179,\n"
+                        + " \"slot\": 1,\n"
+                        + " \"position\": 0,\n"
+                        + " \"type\": \"INGREDIENTS\",\n"
+                        + " \"value\": {\n"
+                        + " \"ingredients\": [\n"
+                        + " {\n"
+                        + " \"name\": \"1 banana\"\n"
+                        + " }\n"
+                        + " ]\n"
+                        + " }\n"
+                        + "}")
+                .when()
+                .post(getBaseUrl()+"mealplanner/geekbrains/items")
+                .then()
+                .statusCode(200);
 
     }
+
+
+    @Test
+    void getResponseData(){
+        Response response = given()
+                            .when()
+                            .get(getBaseUrl()+"recipes/716429/information?" +
+                            "includeNutrition=false&apiKey=" +getApiKey());
+
+        // Get all headers
+        Headers allHeaders = response.getHeaders();
+        // Get a single header value:
+        System.out.println("Content-Encoding: " + response.getHeader("Content-Encoding"));
+
+        // Get all cookies as simple name-value pairs
+        Map<String, String> allCookies = response.getCookies();
+        // Get a single cookie value:
+        System.out.println("CookieName: " + response.getCookie("cookieName"));
+
+        // Get status line
+        System.out.println("StatusLine: " + response.getStatusLine());
+        // Get status code
+        System.out.println("Code: " + response.getStatusCode());
+
+
+        String cuisine = given()
+                .queryParam("apiKey", getApiKey())
+                .when()
+                .post(getBaseUrl()+"recipes/cuisine")
+                .path("cuisine");
+
+        System.out.println("cuisine: " + cuisine);
+
+        response = given()
+                .queryParam("apiKey", getApiKey())
+                .when()
+                .post(getBaseUrl()+"recipes/cuisine")
+                .then().extract().response();
+
+        String confidence = given()
+                .queryParam("apiKey", getApiKey())
+                .when()
+                .post(getBaseUrl()+"recipes/cuisine")
+                .then().extract()
+                .jsonPath()
+                .get("confidence")
+                .toString();
+
+        System.out.println("confidence: " + confidence);
+
+    }
+
+    @Test
+    void getVerifyingResponseData(){
+
+        JsonPath response = given()
+                .queryParam("apiKey", getApiKey())
+                .queryParam("includeNutrition", "false")
+                .when()
+                .get("https://api.spoonacular.com/recipes/716429/information")
+                .body()
+                .jsonPath();
+        assertThat(response.get("vegetarian"), is(false));
+        assertThat(response.get("vegan"), is(false));
+        assertThat(response.get("license"), equalTo("CC BY-SA 3.0"));
+        assertThat(response.get("pricePerServing"), equalTo(163.15F));
+        assertThat(response.get("extendedIngredients[0].aisle"), equalTo("Milk, Eggs, Other Dairy"));
+
+
+        given()
+                .queryParam("apiKey", getApiKey())
+                .queryParam("includeNutrition", "false")
+                .when()
+                .get("https://api.spoonacular.com/recipes/716429/information")
+                .then()
+                .assertThat()
+                 //.cookie("cookieName", "cookieValue")
+                .statusCode(200)
+                .statusLine("HTTP/1.1 200 OK")
+                .statusLine(containsString("OK"))
+                .header("Connection", "keep-alive")
+                .header("Content-Length", Integer::parseInt, lessThan(3000))
+                .contentType(ContentType.JSON)
+                //  .body(equalTo("something"))
+                .time(lessThan(2000L));
+
+        given()
+                .queryParam("apiKey", getApiKey())
+                .queryParam("includeNutrition", "false")
+                .response()
+                .contentType(ContentType.JSON)
+                .time(lessThan(2000L))
+                .header("Connection", "keep-alive")
+                .expect()
+                .body("vegetarian", is(false))
+                .body("vegan", is(false))
+                .body("license", equalTo("CC BY-SA 3.0"))
+                .body("pricePerServing", equalTo(163.15F))
+                .body("extendedIngredients[0].aisle", equalTo("Milk, Eggs, Other Dairy"))
+                .when()
+                .get("https://api.spoonacular.com/recipes/716429/information");
+
+    }
+
+    @Test
+    void addMealTest() {
+        String id = given()
+                .queryParam("hash", "a3da66460bfb7e62ea1c96cfa0b7a634a346ccbf")
+                .queryParam("apiKey", getApiKey())
+                .body("{\n"
+                        + " \"date\": 1644881179,\n"
+                        + " \"slot\": 1,\n"
+                        + " \"position\": 0,\n"
+                        + " \"type\": \"INGREDIENTS\",\n"
+                        + " \"value\": {\n"
+                        + " \"ingredients\": [\n"
+                        + " {\n"
+                        + " \"name\": \"1 banana\"\n"
+                        + " }\n"
+                        + " ]\n"
+                        + " }\n"
+                        + "}")
+                .when()
+                .post("https://api.spoonacular.com/mealplanner/geekbrains/items")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .get("id")
+                .toString();
+
+        given()
+                .queryParam("hash", "a3da66460bfb7e62ea1c96cfa0b7a634a346ccbf")
+                .queryParam("apiKey", getApiKey())
+                .delete("https://api.spoonacular.com/mealplanner/geekbrains/items/" + id)
+                .then()
+                .statusCode(200);
+    }
+
 
 
 }
-
-
-
-
-
-
-
-
 
