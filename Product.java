@@ -1,27 +1,72 @@
-package lesson8;
-//Создадим класс Product, в котором будет находиться информация по нашему продукту:
-public class Product {
-    // Поля класса
-    public int id;
+package lesson5;
 
-    public String good;
+import com.github.javafaker.Faker;
+import lesson5.api.ProductService;
+import lesson5.dto.Product;
+import lesson5.utils.RetrofitUtils;
+import lombok.SneakyThrows;
+import okhttp3.ResponseBody;
+import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import retrofit2.Response;
 
-    public double price;
+import java.io.IOException;
 
-    public String category_name;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-    // Конструктор
-    public Product(int id, String good, double price, String category_name) {
-        this.id = id;
-        this.good = good;
-        this.price = price;
-        this.category_name = category_name;
+
+public class CreateProductTest {
+
+    static ProductService productService;
+    Product product = null;
+    Faker faker = new Faker();
+    int id;
+
+    @BeforeAll
+    static void beforeAll() {
+        productService = RetrofitUtils.getRetrofit()
+                .create(ProductService.class);
     }
 
-    // Выводим информацию по продукту
-    @Override
-    public String toString() {
-        return String.format("ID: %s | Товар: %s | Цена: %s | Категория: %s",
-                this.id, this.good, this.price, this.category_name);
+    @BeforeEach
+    void setUp() {
+        product = new Product()
+                .withTitle(faker.food().ingredient())
+                .withCategoryTitle("Food")
+                .withPrice((int) (Math.random() * 10000));
     }
+
+    @Test
+    void createProductInFoodCategoryTest() throws IOException {
+        Response<Product> response = productService.createProduct(product)
+                .execute();
+        id =  response.body().getId();
+        assertThat(response.isSuccessful(), CoreMatchers.is(true));
+    }
+
+    @SneakyThrows
+    @AfterEach
+    void tearDown() {
+        Response<ResponseBody> response = productService.deleteProduct(id).execute();
+        assertThat(response.isSuccessful(), CoreMatchers.is(true));
+    }
+    
+    @SneakyThrows
+    @Test
+    void getCategoryByIdPositiveTest() {
+        Response<GetCategoryResponse> response = categoryService.getCategory(1).execute();
+
+        assertThat(response.isSuccessful(), CoreMatchers.is(true));
+        assertThat(response.body().getId(), equalTo(1));
+        assertThat(response.body().getTitle(), equalTo("Food"));
+        response.body().getProducts().forEach(product ->
+                assertThat(product.getCategoryTitle(), equalTo("Food")));
+
+
+    }
+
+
 }
