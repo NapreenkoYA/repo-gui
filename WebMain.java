@@ -1,63 +1,39 @@
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.FindBy;
+package lesson5;
 
-import java.util.List;
+import lesson5.api.CategoryService;
+import lesson5.dto.GetCategoryResponse;
+import lesson5.utils.RetrofitUtils;
+import lombok.SneakyThrows;
+import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import retrofit2.Response;
 
-public class MainMenu extends AbstractPage {
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
-    @FindBy(xpath = ".//ul[@class='menu']/li//a[@href='/abit/']")
-    private WebElement abit;
+public class GetCategoryTest {
 
-    @FindBy(xpath = ".//ul[@class='menu']/li//a[@href='/abit/']/../ul/li")
-    private List<WebElement> subAbitList;
-
-    @FindBy(xpath = ".//ul[@class='menu']/li//a[@href='/student/']")
-    private WebElement student;
-
-    @FindBy(xpath = ".//ul[@class='menu']/li//a[@href='/nauka/otdel-aspirantury-i-doktorantury/']")
-    private WebElement nauka;
-
-    @FindBy(xpath = ".//ul[@class='menu']/li//a[@href='/sotrudniku/']")
-    private WebElement sotrudniku;
-
-    @FindBy(xpath = ".//ul[@class='menu']/li//a[@href='/vypuskniku/']")
-    private WebElement vypuskniku;
-
-    public MainMenu(WebDriver driver) {
-        super(driver);
+    static CategoryService categoryService;
+    @BeforeAll
+    static void beforeAll() {
+        categoryService = RetrofitUtils.getRetrofit().create(CategoryService.class);
     }
 
-    public MainMenu clickabit(){
-        abit.click();
-        return this;
-    }
+    @SneakyThrows
+    @Test
+    void getCategoryByIdPositiveTest() {
+        Response<GetCategoryResponse> response = categoryService.getCategory(1).execute();
 
-    public MainMenu clickstudent(){
-        student.click();
-        return this;
-    }
+        assertThat(response.isSuccessful(), CoreMatchers.is(true));
+        assertThat(response.body().getId(), equalTo(1));
+        assertThat(response.body().getTitle(), equalTo("Food"));
+        response.body().getProducts().forEach(product ->
+                assertThat(product.getCategoryTitle(), equalTo("Food")));
 
-    public MainMenu clicknauka(){
-        nauka.click();
-        return this;
-    }
 
-    public MainMenu clicksotrudniku(){
-        sotrudniku.click();
-        return this;
     }
-
-    public MainMenu clickvypuskniku(){
-        vypuskniku.click();
-        return this;
-    }
-
-    public void clickWelcome(){
-        Actions actions = new Actions(getDriver());
-        actions.moveToElement(abit).click(subAbitList.get(0)).build().perform();
-    }
-
 
 }
+
+  
