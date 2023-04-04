@@ -58,7 +58,7 @@ public class Registration {
         webDriver.get("https://test-stand.gb.ru/login");
         webDriver.findElement(By.id("login.username")).sendKeys("x");
 
-        Assert.assertEquals("login меньше допустимого",
+        Assert.assertEquals("логин меньше допустимого",
                 webDriver.findElement(By.xpath("//*[mdc-text-field__input]")).getText());
     }
 
@@ -69,7 +69,7 @@ public class Registration {
         webDriver.findElement(By.id("login.username")).sendKeys("fdgdfgdfgdfgdfggdddddddddddddd");
         webDriver.findElement(By.cssSelector("#root > div > div > form > footer > button")).click();
 
-        Assert.assertEquals("login больше допустимого",
+        Assert.assertEquals("логин больше допустимого",
                 webDriver.findElement(By.xpath("//*[mdc-text-field__input]")).getText());
     }
 
