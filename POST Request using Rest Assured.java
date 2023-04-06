@@ -1,3 +1,7 @@
+package assertionexamples;
+
+import static io.restassured.RestAssured.given;
+
 
 // Valid POST Request using Rest Assured
 public void UserRegistrationSuccessful() 
