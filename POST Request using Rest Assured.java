@@ -16,7 +16,7 @@ public void UserRegistrationSuccessful()
 }
 
 //. InValid POST Request using Rest Assured
-public void UserRegistrationSuccessful() 
+public void UserRegistrationUnSuccessful() 
 { 
     RestAssured.baseURI =" https://test-stand.gb.ru/gateway/login"; 
     RequestSpecification request = RestAssured.given(); 
