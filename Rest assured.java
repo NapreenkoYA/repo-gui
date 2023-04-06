@@ -17,16 +17,13 @@ import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
-/**
- * @author Faisal Khatri
- * @since 12/30/2022
- **/
+
 @Epic ("Rest Assured POC - Example Tests")
 @Feature ("Performing different API Tests using Rest-Assured")
 @Story ("Number related Assertions using Hamcrest in rest assured")
 public class NumberRelatedAssertionTests {
 
-    private static String URL = "https://reqres.in/api/users/";
+    private static String URL = "https://test-stand.gb.ru/api/posts?owner=notMe&sort=createdAt&order=ASC&page=1";
 
     @Test
     @Description ("Example Test for performing number related assertions using Hamcrest")
